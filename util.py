@@ -12,13 +12,13 @@ def get_limits(color):
 
     # Handle red hue wrap-around
     if hue >= 165:  # Upper limit for divided red hue
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
+        lowerLimit = np.array([hue - 1, 100, 100], dtype=np.uint8)
         upperLimit = np.array([180, 255, 255], dtype=np.uint8)
     elif hue <= 15:  # Lower limit for divided red hue
         lowerLimit = np.array([0, 100, 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+        upperLimit = np.array([hue + 1, 255, 255], dtype=np.uint8)
     else:
-        lowerLimit = np.array([hue - 10, 100, 100], dtype=np.uint8)
-        upperLimit = np.array([hue + 10, 255, 255], dtype=np.uint8)
+        lowerLimit = np.array([hue - 1, 100, 100], dtype=np.uint8)
+        upperLimit = np.array([hue + 1, 255, 255], dtype=np.uint8)
 
     return lowerLimit, upperLimit
