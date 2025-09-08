@@ -61,6 +61,7 @@ while True:
         yYellow = y2Yellow - y1Yellow
         alphayellow = math.atan(xYellow / yYellow) * 180 / math.pi
         areayellow = xYellow * yYellow
+        print(bboxYellow)
 
     if bboxBlue is not None:
         x1Blue, y1Blue, x2Blue, y2Blue = bboxBlue
@@ -111,7 +112,19 @@ while True:
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
                 print("G Saite")
     elif areagreen > 150:
-        print(alphagreen)
+        if 70 < alphagreen < 90:
+            if (greendot_y > 300 and greendot_y != 0):
+                print("D Saite")
+        if alphagreen < 70:
+            if (greendot_y > 300 and greendot_y != 0):
+                print("G Saite")
+        if 60 < alphagreen < 90:
+            if (greendot_y < 300 and greendot_y != 0):
+                print("A Saite")
+        if alphagreen < 60:
+            if (greendot_y < 300 and greendot_y != 0):
+                print("E Saite")
+
         # Muss noch Code für oberen Viertel machen.
 
     cv2.imshow('frame', frame)
@@ -120,3 +133,9 @@ while True:
 
 cap.release()
 cv2.destroyAllWindows()
+
+#Dots for Distance Calculation
+#E: 318, 321
+#A: 340, 320
+#D: 350, 320
+#G: 360, 320
