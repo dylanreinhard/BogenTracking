@@ -6,10 +6,12 @@ from util import get_limits
 
 # Definiere die Farbwerte im BGR-Farbraum
 yellow = [26, 214, 232]
-blue = [226, 177, 45]
+blue = [255, 255, 139]
 purple = [213, 131, 250]
 green = [161, 223, 145]
 dark_green = [91, 129, 41]
+
+bow_location = []
 
 cap = cv2.VideoCapture(1)
 while True:
@@ -59,6 +61,9 @@ while True:
     g_contact_point = (360, 300)
     half_bow = 31
     quarter_bow = 15
+    darkgreen_dot = 50
+    blue_dot = 35
+    yellow_dot = 4
 
     x1Yellow, y1Yellow, x2Yellow, y2Yellow = 0,0,0,0
 
@@ -114,7 +119,18 @@ while True:
                 # print(yellowDistanceRatio)
                 distance = math.sqrt((d_contact_point[0] - x1Yellow) ** 2 + (d_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
-                print(f"{realDistance} away from Yellow")
+
+                if x1Yellow > d_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Yellow")
+
+                if vorzeichen == "-":
+                    bow_location.append(yellow_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(yellow_dot + realDistance)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
                 #print("A Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
@@ -122,7 +138,18 @@ while True:
                 #print(yellowDistanceRatio)
                 distance=math.sqrt((a_contact_point[0] - x1Yellow) ** 2 + (a_contact_point[1] - y2Yellow) ** 2)
                 realDistance=distance*yellowDistanceRatio
-                print(f"{realDistance} away from Yellow")
+
+                if x1Yellow > a_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Yellow")
+
+                if vorzeichen == "-":
+                    bow_location.append(yellow_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(yellow_dot + realDistance)
         if alphayellow < 60:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
                 #print("G Saite")
@@ -131,7 +158,18 @@ while True:
                 # print(yellowDistanceRatio)
                 distance = math.sqrt((g_contact_point[0] - x1Yellow) ** 2 + (g_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
-                print(f"{realDistance} away from Yellow")
+
+                if x1Yellow > g_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Yellow")
+
+                if vorzeichen == "-":
+                    bow_location.append(yellow_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(yellow_dot + realDistance)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
                 #print("E Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
@@ -139,71 +177,170 @@ while True:
                 # print(yellowDistanceRatio)
                 distance = math.sqrt((e_contact_point[0] - x1Yellow) ** 2 + (e_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
-                print(f"{realDistance} away from Yellow")
+
+                if x1Yellow > e_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Yellow")
+
+                if vorzeichen == "-":
+                    bow_location.append(yellow_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(yellow_dot + realDistance)
     elif areablue > 150 and areayellow < 150:
         if 65 < alphablue < 90:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
                 #print("D Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
-                blueDistanceRatio = half_bow / bluePixelDistance
+                blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((d_contact_point[0] - x1Yellow) ** 2 + (d_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Blue")
+
+                if x1Blue > d_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Blue")
+
+                if vorzeichen == "-":
+                    bow_location.append(blue_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(blue_dot + realDistance)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
                 #print("A Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
-                blueDistanceRatio = half_bow / bluePixelDistance
+                blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((a_contact_point[0] - x1Yellow) ** 2 + (a_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Blue")
+
+                if x1Blue > a_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Blue")
+
+                if vorzeichen == "-":
+                    bow_location.append(blue_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(blue_dot + realDistance)
         if alphablue < 65:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
                 #print("G Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
-                blueDistanceRatio = half_bow / bluePixelDistance
-                distance = math.sqrt((g_contact_point[0] - x1Yellow) ** 2 + (g_contact_point[1] - y2Yellow) ** 2)
+                blueDistanceRatio = quarter_bow / bluePixelDistance
+                distance = math.sqrt((g_contact_point[0] - x1Blue) ** 2 + (g_contact_point[1] - y2Blue) ** 2)
                 realDistance = distance * blueDistanceRatio
-                print(realDistance + " away from Blue")
+
+                if x1Blue > g_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Blue")
+
+                if vorzeichen == "-":
+                    bow_location.append(blue_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(blue_dot + realDistance)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
                 #print("E Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
-                blueDistanceRatio = half_bow / bluePixelDistance
+                blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((e_contact_point[0] - x1Yellow) ** 2 + (e_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Blue")
+
+                if x1Blue > e_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Blue")
+
+                if vorzeichen == "-":
+                    bow_location.append(blue_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(blue_dot + realDistance)
     elif areagreen > 150 and areablue < 150 and areayellow < 150:
         if 70 < alphagreen < 90:
             if (greendot_y > 300 and greendot_y != 0):
                 #print("D Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
-                greenDistanceRatio = half_bow / greenPixelDistance
+                greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((d_contact_point[0] - x1DarkGreen) ** 2 + (d_contact_point[1] - y2DarkGreen) ** 2)
-                realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Green")
+                realDistance = distance * greenDistanceRatio
+
+                if x1DarkGreen > d_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Green")
+
+                if vorzeichen == "-":
+                    bow_location.append(darkgreen_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(darkgreen_dot + realDistance)
         if alphagreen < 70:
             if (greendot_y > 300 and greendot_y != 0):
                 #print("G Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
-                greenDistanceRatio = half_bow / greenPixelDistance
+                greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((a_contact_point[0] - x1DarkGreen) ** 2 + (a_contact_point[1] - y2DarkGreen) ** 2)
-                realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Green")
+                realDistance = distance * greenDistanceRatio
+
+                if x1DarkGreen > g_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Green")
+
+                if vorzeichen == "-":
+                    bow_location.append(darkgreen_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(darkgreen_dot + realDistance)
         if 60 < alphagreen < 90:
             if (greendot_y < 300 and greendot_y != 0):
                 #print("A Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
-                greenDistanceRatio = half_bow / greenPixelDistance
+                greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((g_contact_point[0] - x1DarkGreen) ** 2 + (g_contact_point[1] - y2DarkGreen) ** 2)
-                realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Green")
+                realDistance = distance * greenDistanceRatio
+
+                if x1DarkGreen > a_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Green")
+
+                if vorzeichen == "-":
+                    bow_location.append(darkgreen_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(darkgreen_dot + realDistance)
         if alphagreen < 60:
             if (greendot_y < 300 and greendot_y != 0):
                 #print("E Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
-                greenDistanceRatio = half_bow / greenPixelDistance
+                greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((e_contact_point[0] - x1DarkGreen) ** 2 + (e_contact_point[1] - y2DarkGreen) ** 2)
-                realDistance = distance * blueDistanceRatio
-                print(f"{realDistance} away from Green")
+                realDistance = distance * greenDistanceRatio
+
+                if x1DarkGreen > e_contact_point[0]:
+                    vorzeichen = "-"
+                else:
+                    vorzeichen = "+"
+
+                print(vorzeichen + f"{realDistance} away from Green")
+
+                if vorzeichen == "-":
+                    bow_location.append(darkgreen_dot - realDistance)
+                elif vorzeichen == "+":
+                    bow_location.append(darkgreen_dot + realDistance)
 
 
     cv2.imshow('frame', frame)
@@ -213,8 +350,13 @@ while True:
 cap.release()
 cv2.destroyAllWindows()
 
-#Dots for Distance Calculation
-#E: 318, 321
-#A: 340, 320
-#D: 350, 320
-#G: 360, 320
+totalDistance = 0
+
+print(bow_location)
+
+for i in range(len(bow_location) - 1):
+    difference = math.sqrt((bow_location[i+1] - bow_location[i])**2)
+    if difference < 15:
+        totalDistance += difference
+
+print(totalDistance)
