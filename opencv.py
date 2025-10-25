@@ -3,9 +3,18 @@ import numpy
 from PIL import Image
 import math
 import time  # <-- Added for time tracking
+
+from pandas.core.interchange.from_dataframe import primitive_column_to_ndarray
+
 from util import get_limits
 import seaborn as sns
 import matplotlib.pyplot as plt
+
+aruco_dict = cv2.aruco.getPredefinedDictionary(cv2.aruco.DICT_4X4_50)
+parameters = cv2.aruco.DetectorParameters()
+detector = cv2.aruco.ArucoDetector(aruco_dict, parameters)
+
+marker_length = 0.02
 
 # Definiere die Farbwerte im BGR-Farbraum
 yellow = [26, 214, 232]
@@ -17,7 +26,7 @@ dark_green = [91, 129, 41]
 bow_location = []
 bow_time = []
 
-cap = cv2.VideoCapture(2)
+cap = cv2.VideoCapture(1)
 while True:
     ret, frame = cap.read()
     if not ret:
@@ -25,31 +34,10 @@ while True:
         break
 
     frame = cv2.resize(frame, (640, 480))
-    hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
-    lowerLimitYellow, upperLimitYellow = get_limits(color=yellow)
-    lowerLimitBlue, upperLimitBlue = get_limits(color=blue)
-    lowerLimitPurple, upperLimitPurple = get_limits(color=purple)
-    lowerLimitGreen, upperLimitGreen = get_limits(color=green)
-    lowerLimitDarkGreen, upperLimitDarkGreen = get_limits(color=dark_green)
-
-    maskYellow = cv2.inRange(hsvImage, lowerLimitYellow, upperLimitYellow)
-    maskBlue = cv2.inRange(hsvImage, lowerLimitBlue, upperLimitBlue)
-    maskPurple = cv2.inRange(hsvImage, lowerLimitPurple, upperLimitPurple)
-    maskGreen = cv2.inRange(hsvImage, lowerLimitGreen, upperLimitGreen)
-    maskDarkGreen = cv2.inRange(hsvImage, lowerLimitDarkGreen, upperLimitDarkGreen)
-
-    maskYellow_ = Image.fromarray(maskYellow)
-    maskBlue_ = Image.fromarray(maskBlue)
-    maskPurple_ = Image.fromarray(maskPurple)
-    maskGreen_ = Image.fromarray(maskGreen)
-    maskDarkGreen_ = Image.fromarray(maskDarkGreen)
-
-    bboxYellow = maskYellow_.getbbox()
-    bboxBlue = maskBlue_.getbbox()
-    bboxPurple = maskPurple_.getbbox()
-    bboxGreen = maskGreen_.getbbox()
-    bboxDarkGreen = maskDarkGreen_.getbbox()
+    bboxYellow = 0 # Marker 0 and 1
+    bboxBlue = 0   # Marker 1 and 2
+    bboxGreen = 0 # Marker 2 and 3
 
     alphayellow = 0 # Winkel für gelbe Markierung
     alphablue = 0   # Winkel für blaue Markierung
@@ -57,8 +45,8 @@ while True:
     areayellow = 0  # Fläche der gelben Markierung
     areablue = 0    # Fläche der blauen Markierung
     areagreen = 0   # Fläche der dunkel grünen Markierung
-    purpledot_y = 0 # y-Koordinate des lila Punktes
-    greendot_y = 0  # y-Koordinate des grünen Punktes
+    purpledot_y = 0 # y-Koordinate Marker 1
+    greendot_y = 0  # y-Koordinate Marker 3
     e_contact_point = (310, 300)
     a_contact_point = (330, 300)
     d_contact_point = (350, 300)
@@ -66,54 +54,51 @@ while True:
     half_bow = 31
     quarter_bow = 15
     full_bow = 62
-    darkgreen_dot = 50
-    blue_dot = 35
-    yellow_dot = 4
+    darkgreen_dot = 50 # Marker 2
+    blue_dot = 35 # Marker 1
+    yellow_dot = 4 # Marker 0
 
-    x1Yellow, y1Yellow, x2Yellow, y2Yellow = 0,0,0,0
+    gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
+    corners, ids, rejected = detector.detectMarkers(gray)
 
-    x1Blue, y1Blue, x2Blue, y2Blue = 0,0,0,0
+    MARKER_IDS = {0, 1, 2, 3}
+    marker_pixels = {mid: None for mid in MARKER_IDS}
 
-    x1Purple, y1Purple, x2Purple, y2Purple = 0,0,0,0
+    if ids is not None:
+        for i, corner in enumerate(corners):
+            mid = int(ids[i][0])
+            if mid in MARKER_IDS:
+                pts = corner.reshape((4, 2))  # four (x, y) corners
+                cx, cy = pts.mean(axis=0)  # centroid as floats
+                marker_pixels[mid] = (int(round(cx)), int(round(cy)))
 
-    x1Green, y1Green, x2Green, y2Green = 0,0,0,0
+    # print only detected markers
+    for mid, coords in marker_pixels.items():
+        if coords is not None:
+            print(f"id {mid}: {coords}")
 
-    x1DarkGreen, y1DarkGreen, x2DarkGreen, y2DarkGreen = 0,0,0,0
+    # example: read marker 0 coords safely
+    coords0 = marker_pixels.get(0)
+    if coords0:
+        x_pixel, y_pixel = coords0
 
-    if bboxYellow is not None:
-        x1Yellow, y1Yellow, x2Yellow, y2Yellow = bboxYellow
-        frame = cv2.rectangle(frame, (x1Yellow, y1Yellow), (x2Yellow, y2Yellow), (0, 255, 0), 5)
-        xYellow = x2Yellow - x1Yellow
-        yYellow = y2Yellow - y1Yellow
-        alphayellow = math.atan(xYellow / yYellow) * 180 / math.pi
-        areayellow = xYellow * yYellow
-        #print(areayellow)
+    xYellow = marker_pixels.get(1)[0] - marker_pixels.get(0)[0]
+    yYellow = marker_pixels.get(1)[1] - marker_pixels.get(0)[1]
+    alphayellow = math.atan2(xYellow, yYellow) * 180 / math.pi
+    areayellow = abs(xYellow * yYellow)
 
-    if bboxBlue is not None:
-        x1Blue, y1Blue, x2Blue, y2Blue = bboxBlue
-        frame = cv2.rectangle(frame, (x1Blue, y1Blue), (x2Blue, y2Blue), (0, 0, 255), 5)
-        xBlue = x2Blue - x1Blue
-        yBlue = y2Blue - y1Blue
-        alphablue = math.atan(xBlue / yBlue) * 180 / math.pi
-        areablue = xBlue * yBlue
+    xBlue = marker_pixels.get(2)[0] - marker_pixels.get(1)[0]
+    yBlue = marker_pixels.get(2)[1] - marker_pixels.get(1)[1]
+    alphablue = math.atan2(xBlue, yBlue) * 180 / math.pi
+    areablue = abs(xBlue * yBlue)
 
-    if bboxPurple is not None:
-        x1Purple, y1Purple, x2Purple, y2Purple = bboxPurple
-        frame = cv2.rectangle(frame, (x1Purple, y1Purple), (x2Purple, y2Purple), (255, 0, 0), 5)
-        purpledot_y = y1Purple
+    xDarkGreen = marker_pixels.get(3)[0] - marker_pixels.get(2)[0]
+    yDarkGreen = marker_pixels.get(3)[1] - marker_pixels.get(2)[1]
+    alphagreen = math.atan2(xDarkGreen, yDarkGreen) * 180 / math.pi
+    areagreen = abs(xDarkGreen * yDarkGreen)
 
-    if bboxGreen is not None:
-        x1Green, y1Green, x2Green, y2Green = bboxGreen
-        frame = cv2.rectangle(frame, (x1Green, y1Green), (x2Green, y2Green), (0, 255, 255), 5)
-        greendot_y = y1Green
-
-    if bboxDarkGreen is not None:
-        x1DarkGreen, y1DarkGreen, x2DarkGreen, y2DarkGreen = bboxDarkGreen
-        frame = cv2.rectangle(frame, (x1DarkGreen, y1DarkGreen), (x2DarkGreen, y2DarkGreen), (255, 255, 0), 5)
-        xDarkGreen = x2DarkGreen - x1DarkGreen
-        yDarkGreen = y2DarkGreen - y1DarkGreen
-        alphagreen = math.atan(xDarkGreen / yDarkGreen) * 180 / math.pi
-        areagreen = xDarkGreen * yDarkGreen
+    purpledot_y = marker_pixels.get(0)[1]
+    greendot_y = marker_pixels.get(3)[1]
 
     if areayellow > 1500:
         if 60 < alphayellow < 90:
