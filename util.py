@@ -1,7 +1,7 @@
 import numpy as np
 import cv2
 
-
+# aus https://github.com/computervisioneng/color-detection-opencv aber angepasst für strengere Farberkennung
 
 
 def get_limits(color):

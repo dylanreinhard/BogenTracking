@@ -1,5 +1,5 @@
 import cv2
-import numpy
+import numpy as np
 from PIL import Image
 import math
 import time  # <-- Added for time tracking
@@ -27,6 +27,7 @@ while True:
     frame = cv2.resize(frame, (640, 480))
     hsvImage = cv2.cvtColor(frame, cv2.COLOR_BGR2HSV)
 
+    # Dieser Teil ist aus https://github.com/computervisioneng/color-detection-opencv
     lowerLimitYellow, upperLimitYellow = get_limits(color=yellow)
     lowerLimitBlue, upperLimitBlue = get_limits(color=blue)
     lowerLimitPurple, upperLimitPurple = get_limits(color=purple)
@@ -87,7 +88,6 @@ while True:
         yYellow = y2Yellow - y1Yellow
         alphayellow = math.atan(xYellow / yYellow) * 180 / math.pi
         areayellow = xYellow * yYellow
-        #print(areayellow)
 
     if bboxBlue is not None:
         x1Blue, y1Blue, x2Blue, y2Blue = bboxBlue
@@ -118,10 +118,8 @@ while True:
     if areayellow > 1500:
         if 60 < alphayellow < 90:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
-                #print("D Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
                 yellowDistanceRatio = half_bow / yellowPixelDistance
-                # print(yellowDistanceRatio)
                 distance = math.sqrt((d_contact_point[0] - x1Yellow) ** 2 + (d_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
 
@@ -141,10 +139,8 @@ while True:
                     bow_location.append(yellow_dot + realDistance)
                     bow_time.append(now)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
-                #print("A Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
                 yellowDistanceRatio = half_bow / yellowPixelDistance
-                #print(yellowDistanceRatio)
                 distance=math.sqrt((a_contact_point[0] - x1Yellow) ** 2 + (a_contact_point[1] - y2Yellow) ** 2)
                 realDistance=distance*yellowDistanceRatio
 
@@ -165,10 +161,8 @@ while True:
                     bow_time.append(now)
         if alphayellow < 60:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
-                #print("G Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
                 yellowDistanceRatio = half_bow / yellowPixelDistance
-                # print(yellowDistanceRatio)
                 distance = math.sqrt((g_contact_point[0] - x1Yellow) ** 2 + (g_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
 
@@ -188,10 +182,8 @@ while True:
                     bow_location.append(yellow_dot + realDistance)
                     bow_time.append(now)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
-                #print("E Saite")
                 yellowPixelDistance = math.sqrt((x2Yellow - x1Yellow) ** 2 + (y2Yellow - y1Yellow) ** 2)
                 yellowDistanceRatio = half_bow / yellowPixelDistance
-                # print(yellowDistanceRatio)
                 distance = math.sqrt((e_contact_point[0] - x1Yellow) ** 2 + (e_contact_point[1] - y2Yellow) ** 2)
                 realDistance = distance * yellowDistanceRatio
 
@@ -213,7 +205,6 @@ while True:
     elif areablue > 150 and areayellow < 1500:
         if 65 < alphablue < 90:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
-                #print("D Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
                 blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((d_contact_point[0] - x1Yellow) ** 2 + (d_contact_point[1] - y2Yellow) ** 2)
@@ -235,7 +226,6 @@ while True:
                     bow_location.append(blue_dot + realDistance)
                     bow_time.append(now)
             elif (purpledot_y < 300 and purpledot_y != 0) or (greendot_y > 300 and greendot_y != 0):
-                #print("A Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
                 blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((a_contact_point[0] - x1Yellow) ** 2 + (a_contact_point[1] - y2Yellow) ** 2)
@@ -258,7 +248,6 @@ while True:
                     bow_time.append(now)
         if alphablue < 65:
             if (purpledot_y > 300 and purpledot_y != 0) or (greendot_y < 300 and greendot_y != 0):
-                #print("G Saite")
                 bluePixelDistance = math.sqrt((x2Blue - x1Blue) ** 2 + (y2Blue - y1Blue) ** 2)
                 blueDistanceRatio = quarter_bow / bluePixelDistance
                 distance = math.sqrt((g_contact_point[0] - x1Blue) ** 2 + (g_contact_point[1] - y2Blue) ** 2)
@@ -304,7 +293,6 @@ while True:
     elif areagreen > 150 and areablue < 150 and areayellow < 1500:
         if 70 < alphagreen < 90:
             if (greendot_y > 300 and greendot_y != 0):
-                #print("D Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
                 greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((d_contact_point[0] - x1DarkGreen) ** 2 + (d_contact_point[1] - y2DarkGreen) ** 2)
@@ -327,7 +315,6 @@ while True:
                     bow_time.append(now)
         if alphagreen < 70:
             if (greendot_y > 300 and greendot_y != 0):
-                #print("G Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
                 greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((a_contact_point[0] - x1DarkGreen) ** 2 + (a_contact_point[1] - y2DarkGreen) ** 2)
@@ -350,7 +337,6 @@ while True:
                     bow_time.append(now)
         if 60 < alphagreen < 90:
             if (greendot_y < 300 and greendot_y != 0):
-                #print("A Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
                 greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((g_contact_point[0] - x1DarkGreen) ** 2 + (g_contact_point[1] - y2DarkGreen) ** 2)
@@ -373,7 +359,6 @@ while True:
                     bow_time.append(now)
         if alphagreen < 60:
             if (greendot_y < 300 and greendot_y != 0):
-                #print("E Saite")
                 greenPixelDistance = math.sqrt((x2DarkGreen - x1DarkGreen) ** 2 + (y2DarkGreen - y1DarkGreen) ** 2)
                 greenDistanceRatio = quarter_bow / greenPixelDistance
                 distance = math.sqrt((e_contact_point[0] - x1DarkGreen) ** 2 + (e_contact_point[1] - y2DarkGreen) ** 2)
@@ -407,13 +392,11 @@ cv2.destroyAllWindows()
 
 totalDistance = 0
 
-print(bow_location)
-
 filtered_locations = []
 filtered_times = []
 
 MIN_VELOCITY = 0
-MAX_VELOCITY = 75
+MAX_VELOCITY = 100
 
 filtered_locations = []
 filtered_times = []
@@ -429,8 +412,6 @@ for i in range(len(bow_location) - 1):
             filtered_locations.append(loc2)
             filtered_times.append(t2)
 
-print(filtered_locations)
-
 velocities = []
 for i in range(len(filtered_locations) - 1):
     difference = abs(filtered_locations[i+1] - filtered_locations[i])
@@ -440,17 +421,54 @@ for i in range(len(filtered_locations) - 1):
 
 
 print("Total Distance", totalDistance, "cm")
-print("Velocities:", velocities)
 
-if velocities:
-    avg_velocity = sum(velocities) / len(velocities)
-    print("Average velocity:", avg_velocity)
+elapsed_time = filtered_times[-1] - filtered_times[0]
 
-plt.figure(figsize=(10, 4))
-sns.histplot(filtered_locations, bins=31, kde=True, binrange=(0, 62))
-plt.title("Bow Location Frequency")
-plt.xlabel("Bow Location (cm)")
-plt.ylabel("Frequency")
-plt.xlim(0, 62)
+print("Elapsed Time:", elapsed_time, "s")
+
+avg_speed_path = totalDistance / elapsed_time
+
+print (avg_speed_path)
+
+positions = np.array(filtered_locations)
+times = np.array(filtered_times)
+times = times - times.min()
+velocity = np.diff(positions) / np.diff(times)
+vel_times = times[:-1]
+
+plt.figure(figsize=(10, 2))
+
+# Plots mit Integriertem GitHub Copilot generiert, gibt keinen verlauf dafür
+
+hist, bins = np.histogram(positions, bins=80, range=(0, 62))
+
+plt.imshow(hist[np.newaxis, :],
+           cmap="coolwarm",
+           aspect="auto",
+           extent=[0, 62, 0, 1])
+
+plt.yticks([])
+plt.xlabel("Bogenposition (cm)")
+plt.title("Heatmap der Bogenposition (Häufigkeit)")
+
+plt.colorbar(label="Häufigkeit")
 plt.show()
+
+plt.figure(figsize=(10,4))
+plt.plot(times, positions, linewidth=1)
+plt.xlabel("Zeit (s)")
+plt.ylabel("Position auf dem Bogen (cm)")
+plt.title("Bogenposition über Zeit")
+plt.grid(True)
+plt.show()
+
+plt.figure(figsize=(10,4))
+plt.plot(vel_times, velocity, linewidth=1)
+plt.xlabel("Zeit (s)")
+plt.ylabel("Geschwindigkeit (cm/s)")
+plt.title("Bogengeschwindigkeit über Zeit")
+plt.grid(True)
+plt.show()
+
+# Gibt auch noch ArUco Branch, welcher sehr ähnlich ist. Wurde aber in der Arbeit nur für aufnahmen mit Andri benutzt
 
